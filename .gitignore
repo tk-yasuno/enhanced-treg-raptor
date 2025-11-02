@@ -1,4 +1,4 @@
-# Python
+﻿# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -39,10 +39,9 @@ pubmed_cache/
 *.log
 *.tmp
 
-# Results (keep structure, ignore large files)
+# Results (keep structure, ignore large files except visualizations)
 results/*.json
 results/*.txt
-results/visualizations/*.png
 
 # Data cache
 data/enhanced_treg_vocab/pdf_text_cache.json
