@@ -891,12 +891,6 @@ MIT License - 詳細は [LICENSE](../LICENSE) を参照
 
 ---
 
-## �👨‍💻 作者 (Author)
-
-**AI Assistant** with biological expertise collaboration
-
----
-
 ## 🔗 関連プロジェクト (Related Projects)
 
 - [Treg RAPTOR Tree](https://github.com/tk-yasuno/treg-raptor-tree): 親プロジェクト
@@ -904,7 +898,7 @@ MIT License - 詳細は [LICENSE](../LICENSE) を参照
 
 ---
 
-## 📞 お問い合わせ (Contact)
+## お問い合わせ (Contact)
 
 GitHub Issues: [https://github.com/tk-yasuno/treg-raptor-tree/issues](https://github.com/tk-yasuno/treg-raptor-tree/issues)
 
