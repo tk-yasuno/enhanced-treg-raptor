@@ -79,6 +79,16 @@ ENHANCED_LEVEL_COLOR_MAPPING = {
         "description": "Root Node",
         "markers": [],
         "keywords": ["hierarchy root", "top level"]
+,
+    7: {
+        "color": "#27AE60",
+        "name": "iTreg (Induced)",
+        "description": "Peripherally Induced Regulatory T Cell",
+        "markers": ["induced", "peripheral", "TGF-β+", "RA+", "gut-associated"],
+        "keywords": ["peripheral conversion", "TGF-beta induced", "retinoic acid", "oral tolerance", "gut immunity", "iTreg"],
+        "origin": "peripheral",
+        "stability": "variable"
+    }
     }
 }
 
@@ -355,10 +365,13 @@ def determine_treg_level(content):
                       'tgf-beta induc', 'tgf-β induc', 'retinoic acid treg',
                       'gut-associated treg', 'oral tolerance treg']
     
+    # nTreg特異的マーカーがあればLevel 4
     if any(m in content_lower for m in ntreg_specific):
         return 4
+    
+    # iTreg特異的マーカーがあればLevel 7（新設）
     if any(m in content_lower for m in itreg_specific):
-        return 4
+        return 7
     
     # Level 3: CD25high + CD127low - Treg表面マーカー特異的
     cd25_cd127_specific = ['cd4+cd25+cd127low', 'cd4+ cd25+ cd127low', 'cd25high cd127low',
@@ -415,10 +428,33 @@ def determine_treg_level(content):
             # CD25やTregマーカーがなければCD4+ T
             return 2
     
-    # デフォルト: どれにも該当しない、またはTregコンテキストあり
-    # Tregコンテキストがあるが特定できない場合はLevel 4（nTreg/iTreg）
+    # デフォルト: どれにも該当しない場合
+    # Tregコンテキストがあっても特定できない場合はLevel 0（より慎重な分類）
+    # 明確な特徴がない場合は未分類として扱う
+    # if has_treg_context:
+    #     return 4  # 旧ロジック: 不明確なものをL4に入れていた
+    
+    # Treg文脈があるが特定のレベルに分類できない場合
+    # → より一般的なnTreg/iTreg マーカーで再判定
     if has_treg_context:
-        return 4
+        # 一般的なnTreg関連語（胸腺、自然）
+        general_ntreg = ['thymus', 'thymic', 'natural regulatory', 'central tolerance']
+        # 一般的なiTreg関連語（誘導、末梢、腸管）
+        general_itreg = ['peripheral', 'induced', 'conversion', 'gut', 'intestin', 
+                         'mucosal', 'tgf', 'oral tolerance']
+        
+        # 一般的なiTreg文脈があればLevel 7
+        if any(m in content_lower for m in general_itreg):
+            return 7
+        
+        # 一般的なnTreg文脈があればLevel 4  
+        if any(m in content_lower for m in general_ntreg):
+            return 4
+        
+        # それでも不明だが明確にTreg関連なら、デフォルトでnTreg寄りと判断
+        # （胸腺由来が基本形のため）
+        if 'regulatory t' in content_lower or 'cd25+' in content_lower:
+            return 4
     
     # 完全に不明な場合はLevel 0
     return 0
@@ -480,6 +516,18 @@ def generate_enhanced_treg_label(content, level, cluster_id, cluster_size):
         elif 'peripheral' in content_lower or 'induced' in content_lower:
             return f"{base_name}\niTreg-peripheral\n(n={cluster_size})"
     
+    
+    elif level == 7:  # iTreg (末梢誘導Treg) - 新設
+        if 'peripheral' in content_lower or 'induced' in content_lower or 'itreg' in content_lower:
+            if 'tgf-beta' in content_lower or 'tgf-β' in content_lower:
+                return f"iTreg (Induced)\nperipheral-TGF-β\n(n={cluster_size})"
+            elif 'gut' in content_lower or 'oral tolerance' in content_lower:
+                return f"iTreg (Induced)\ngut-associated\n(n={cluster_size})"
+            else:
+                return f"iTreg (Induced)\nperipheral\n(n={cluster_size})"
+        else:
+            return f"iTreg (Induced)\n(n={cluster_size})"
+
     elif level == 3:  # CD25high + CD127low
         cd127_status = "CD127low" if 'cd127' in content_lower or 'il-7r' in content_lower else ""
         if cd127_status:

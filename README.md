@@ -914,3 +914,174 @@ GitHub Issues: [https://github.com/tk-yasuno/treg-raptor-tree/issues](https://gi
 **Version**: 3.0.0 (Level 0削減版)  
 **Test Coverage**: 90% (Level Determination), 100% (Label Generation)  
 **RAPTOR Performance**: Level 0: 23.3%, avg k: 3.2, Silhouette: 0.077
+
+---
+
+## 🎯 Level 4過集中問題の解決 (Level 4 Concentration Issue Resolution)
+
+**日付**: 2025-11-02  
+**バージョン**: 3.1.0 → 3.2.0 (nTreg/iTreg分離版)
+
+### 問題の発見 (Issue Discovery)
+
+初期の7層システムでは、Level 4 (nTreg/iTreg) に文書が過度に集中する問題が発生：
+
+```
+Level 4 (nTreg/iTreg): 921文書 (43.0%)
+```
+
+**原因**: 
+- `nTreg`と`iTreg`が同一レベルに混在
+- 曖昧なTreg文脈がデフォルトでLevel 4に分類される
+
+### 解決アプローチ (Solution Approach)
+
+#### 🔬 生物学的根拠
+nTregとiTregは異なる起源と機能を持つため、分離が必要：
+
+- **nTreg (Natural/Thymic Treg)**: 
+  - 胸腺で分化（AIRE依存性）
+  - Helios+, Nrp1+マーカー
+  - 中枢性免疫寛容
+
+- **iTreg (Induced/Peripheral Treg)**:
+  - 末梢で誘導（TGF-β, レチノイン酸）
+  - 腸管関連、経口免疫寛容
+  - 環境適応的制御
+
+#### 📊 改善の経過 (Improvement Progress)
+
+| バージョン | Level 4 (nTreg) | Level 7 (iTreg) | 合計 | 評価 |
+|---------|----------------|----------------|------|------|
+| **v1 (改善前)** | 921 (43.0%) | 0 (0.0%) | 43.0% | ❌ 過集中・未分離 |
+| **v2 (厳格版)** | 35 (2.7%) | 29 (2.3%) | 5.0% | ❌ 過度な削減 |
+| **v3 (最適版)** | 335 (16.6%) | 466 (23.0%) | 39.6% | ✅ **最適** |
+
+### 技術的実装 (Technical Implementation)
+
+#### 1. 拡張階層構造 (Extended Hierarchy)
+
+新しい8層システム（Level 0-7）：
+
+```python
+Level 0: HSC              # 造血幹細胞
+Level 1: CLP              # 共通リンパ球前駆細胞
+Level 2: CD4+T            # CD4陽性T細胞
+Level 3: CD25+CD127low    # 表面マーカー
+Level 4: nTreg            # 胸腺由来Treg (NEW: 分離)
+Level 5: Foxp3+           # Foxp3発現確認
+Level 6: Functional       # 機能的Treg
+Level 7: iTreg            # 末梢誘導Treg (NEW: 新設)
+```
+
+#### 2. 分類ロジック改善 (Classification Logic)
+
+**nTreg特異的マーカー** (`enhanced_treg_vocab.py`):
+```python
+ntreg_specific = [
+    'thymic treg', 'natural treg', 'ntreg', 'ttreg',
+    'helios+ treg', 'nrp1+ treg', 'aire medulla'
+]
+# → return 4 (nTreg)
+```
+
+**iTreg特異的マーカー**:
+```python
+itreg_specific = [
+    'induced treg', 'itreg', 'ptreg', 
+    'peripheral treg conversion',
+    'tgf-beta induc', 'retinoic acid treg',
+    'gut-associated treg', 'oral tolerance treg'
+]
+# → return 7 (iTreg)
+```
+
+**曖昧なTreg文脈の処理**:
+```python
+# 一般的な文脈による再分類
+general_ntreg = ['thymus', 'thymic', 'natural regulatory']
+general_itreg = ['peripheral', 'induced', 'gut', 'mucosal']
+
+# 明確なTreg文脈があれば適切に振り分け
+if 'regulatory t' in content or 'cd25+' in content:
+    return 4  # デフォルトはnTreg（基本形のため）
+```
+
+#### 3. ビルド・可視化対応
+
+**`build_treg_raptor_16x.py`**:
+```python
+# 8レベル対応
+articles_per_level = self.target_documents // 8
+raptor.initial_clusters = 8
+level_names = [..., "nTreg", "Foxp3+", "Functional", "iTreg"]
+```
+
+**`visualize_treg_raptor_tree.py`**:
+```python
+# Level 7まで対応
+level_counts = {i: 0 for i in range(8)}
+level_names = [..., "iTreg (末梢誘導)"]
+```
+
+### 成果 (Results)
+
+#### ✅ レベル分布の最適化
+
+**改善前 (v1)**:
+```
+Level 0: 23.3%  Level 1: 2.3%   Level 2: 7.0%   Level 3: 0.7%
+Level 4: 43.0% ⚠️  Level 5: 19.6%  Level 6: 4.1%   Level 7: 0.0%
+```
+
+**改善後 (v3)**:
+```
+Level 0: 24.7%  Level 1: 2.5%   Level 2: 7.5%   Level 3: 0.7%
+Level 4: 16.6% ✅  Level 5: 20.8%  Level 6: 4.3%   Level 7: 23.0% ✅
+```
+
+#### 📈 改善指標
+
+- **Level 4削減率**: 43.0% → 16.6% (▼61.4%削減)
+- **nTreg/iTreg分離**: 合計39.6% (生物学的に妥当)
+- **ツリー品質**: 
+  - ノード数: 1374 → 2144 (詳細化)
+  - 深さ: 3（維持）
+  - Silhouette: 0.078 → 0.066 (許容範囲)
+
+#### 🎨 可視化ファイル
+
+改善版の可視化結果:
+- `results/visualizations/tree_structure_20251102_182309.png`
+- `results/visualizations/level_distribution_20251102_182309.png`
+- `results/visualizations/cluster_analysis_20251102_182309.png`
+
+### 教訓 (Lessons Learned)
+
+1. **生物学的妥当性の重要性**
+   - 機能的に異なるサブセット（nTreg vs iTreg）は分離すべき
+   - 起源（胸腺 vs 末梢）は重要な分類軸
+
+2. **段階的改善の有効性**
+   - v1 → v2: 厳格すぎて失敗
+   - v2 → v3: fallbackロジック追加で最適化
+
+3. **バランスの重要性**
+   - 厳格すぎる分類: データ損失
+   - 緩すぎる分類: 過集中
+   - v3: 適切なバランス達成
+
+### 次のステップ (Next Steps)
+
+- [ ] Level 7 (iTreg)特異的なクエリ戦略の開発
+- [ ] nTreg/iTreg相互作用の解析
+- [ ] サブタイプ別機能評価システムの構築
+
+---
+
+**Last Updated**: 2025-11-02  
+**Current Version**: 3.2.0 (nTreg/iTreg分離版)  
+**Test Coverage**: 90% (Level Determination), 100% (Label Generation)  
+**RAPTOR Performance**: Total nodes: 2144, Depth: 3, Silhouette: 0.066  
+**Level Distribution**: L4 (nTreg): 16.6%, L7 (iTreg): 23.0%
+

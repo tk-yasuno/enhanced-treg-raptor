@@ -227,9 +227,10 @@ def visualize_tree_hierarchical(tree_data: dict, output_path: str = None, intern
         "CLP (リンパ球前駆細胞)",
         "CD4+T (ナイーブT細胞)",
         "CD4+CD25+CD127low",
-        "nTreg/iTreg (起源識別)",
+        "nTreg (胸腺由来)",
         "Foxp3+Treg (発現確認)",
-        "Functional Treg (機能確認)"
+        "Functional Treg (機能確認)",
+        "iTreg (末梢誘導)"
     ]
     
     for level in range(7):
@@ -258,7 +259,7 @@ def visualize_level_distribution(tree_data: dict, output_path: str = None):
     tree = tree_data.get('tree_nodes', {})
     
     # レベルごとのノード数を集計
-    level_counts = {i: 0 for i in range(7)}
+    level_counts = {i: 0 for i in range(8)}
     
     for node in tree.values():
         treg_level = determine_node_treg_level(node)
@@ -305,9 +306,10 @@ def visualize_level_distribution(tree_data: dict, output_path: str = None):
         "L1: CLP",
         "L2: CD4+T",
         "L3: CD25+CD127low",
-        "L4: nTreg/iTreg",
+        "L4: nTreg",
         "L5: Foxp3+",
-        "L6: Functional"
+        "L6: Functional",
+        "L7: iTreg"
     ]
     
     labels = [level_names[l] for l in non_zero_levels]
@@ -371,7 +373,7 @@ def visualize_cluster_analysis(tree_data: dict, output_path: str = None):
     # クラスタごとのTregレベル分布
     level_by_cluster = {}
     for cluster_id, data in clusters.items():
-        level_counts = {i: 0 for i in range(7)}
+        level_counts = {i: 0 for i in range(8)}
         for level in data['levels']:
             level_counts[level] += 1
         level_by_cluster[cluster_id] = level_counts

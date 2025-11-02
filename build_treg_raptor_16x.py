@@ -311,7 +311,7 @@ class EnhancedTregRAPTOR16xBuilder:
         }
         
         all_articles = []
-        articles_per_level = self.target_documents // 7  # 各レベル約308件
+        articles_per_level = self.target_documents // 8  # 各レベル約270件 (8 levels: 0-7)
         seen_pmids = set()
         
         # 並列処理でレベルごとに収集
@@ -335,7 +335,7 @@ class EnhancedTregRAPTOR16xBuilder:
         self.log_info(f"\n  ✓ Total collected: {len(all_articles)} articles from PubMed")
         return all_articles
         
-        for level in range(7):
+        for level in range(8):
             level_articles = []
             queries = treg_queries[level]
             
@@ -423,15 +423,24 @@ class EnhancedTregRAPTOR16xBuilder:
         """文書のTregレベル分布を分析（determined_levelを使用）"""
         self.log_info(f"\n📊 Analyzing document distribution by Treg level...")
         
-        level_counts = {i: 0 for i in range(7)}
+        level_counts = {i: 0 for i in range(8)}
         for doc in documents:
             level = doc['determined_level']  # enhanced_treg_vocabによる判定レベルを使用
             level_counts[level] += 1
         
         total = len(documents)
-        level_names = ["HSC", "CLP", "CD4+T", "CD25+CD127low", "nTreg/iTreg", "Foxp3+", "Functional"]
+        level_names = [
+            "HSC",
+            "CLP", 
+            "CD4+T",
+            "CD25+CD127low",
+            "nTreg",
+            "Foxp3+",
+            "Functional",
+            "iTreg"
+        ]
         
-        for level in range(7):
+        for level in range(8):
             count = level_counts[level]
             percentage = (count / total * 100) if total > 0 else 0
             self.log_info(f"  Level {level} ({level_names[level]:15s}): {count:3d} docs ({percentage:5.1f}%)")
@@ -466,7 +475,7 @@ class EnhancedTregRAPTOR16xBuilder:
             # TrueRAPTORTreeをTop-down戦略で初期化
             raptor = TrueRAPTORTree()
             raptor.clustering_strategy = "top_down"  # Top-downクラスタリング
-            raptor.initial_clusters = 7  # Tregの7レベルに対応
+            raptor.initial_clusters = 8  # Tregの8レベルに対応 (0-7: added iTreg as Level 7)
             raptor.max_cluster_size = 50  # 大規模データセット用に調整
             
             init_time = time.time() - init_start
