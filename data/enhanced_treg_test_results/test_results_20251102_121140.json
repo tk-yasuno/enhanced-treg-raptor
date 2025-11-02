@@ -1,0 +1,224 @@
+{
+  "timestamp": "20251102_121140",
+  "summary": [
+    {
+      "test": "Level Determination",
+      "passed": true,
+      "elapsed_seconds": 0.016713619232177734
+    },
+    {
+      "test": "Label Generation",
+      "passed": true,
+      "elapsed_seconds": 0.004081249237060547
+    },
+    {
+      "test": "Vocabulary Coverage",
+      "passed": true,
+      "elapsed_seconds": 0.0011203289031982422
+    },
+    {
+      "test": "GPU Performance",
+      "passed": true,
+      "elapsed_seconds": 0.17005228996276855
+    }
+  ],
+  "detailed_results": {
+    "level_determination": {
+      "total": 10,
+      "passed": 9,
+      "failed": 1,
+      "accuracy": 90.0,
+      "details": [
+        {
+          "test_case": 1,
+          "content_preview": "Hematopoietic stem cells (HSC) reside in bone marrow niches with multipotent self-renewal capacity. ",
+          "expected_level": 0,
+          "detected_level": 0,
+          "expected_name": "HSC",
+          "detected_name": "HSC",
+          "passed": true
+        },
+        {
+          "test_case": 2,
+          "content_preview": "Common lymphoid progenitors (CLP) express IL-7R and Flt3, committing to lymphoid lineage. IL-7 signa",
+          "expected_level": 1,
+          "detected_level": 1,
+          "expected_name": "CLP",
+          "detected_name": "CLP",
+          "passed": true
+        },
+        {
+          "test_case": 3,
+          "content_preview": "CD4+ T helper cells recognize MHC class II presented antigens via TCR. Thymic selection produces CD4",
+          "expected_level": 2,
+          "detected_level": 2,
+          "expected_name": "CD4+T",
+          "detected_name": "CD4+T",
+          "passed": true
+        },
+        {
+          "test_case": 4,
+          "content_preview": "Human Treg identification uses CD4+CD25high CD127low phenotype. IL-2Rα high expression with IL-7Rα l",
+          "expected_level": 3,
+          "detected_level": 3,
+          "expected_name": "CD4+CD25+CD127low",
+          "detected_name": "CD4+CD25+CD127low",
+          "passed": true
+        },
+        {
+          "test_case": 5,
+          "content_preview": "Natural Treg (nTreg) develop in thymus with Helios+ Nrp1+ phenotype. Thymic selection by AIRE-expres",
+          "expected_level": 4,
+          "detected_level": 4,
+          "expected_name": "nTreg/iTreg",
+          "detected_name": "nTreg/iTreg",
+          "passed": true
+        },
+        {
+          "test_case": 6,
+          "content_preview": "Peripheral induced Treg (iTreg) convert from naive CD4+ T cells in gut mucosa. TGF-beta and retinoic",
+          "expected_level": 4,
+          "detected_level": 4,
+          "expected_name": "nTreg/iTreg",
+          "detected_name": "nTreg/iTreg",
+          "passed": true
+        },
+        {
+          "test_case": 7,
+          "content_preview": "Stable Foxp3+ Treg show TSDR demethylation at CNS2 region ensuring epigenetic stability. CD45RA+ res",
+          "expected_level": 5,
+          "detected_level": 5,
+          "expected_name": "Foxp3+Treg",
+          "detected_name": "Foxp3+Treg",
+          "passed": true
+        },
+        {
+          "test_case": 8,
+          "content_preview": "Activated CD4+ T cells transiently express Foxp3 upon TCR stimulation. CD45RO+ effector T cells with",
+          "expected_level": 5,
+          "detected_level": 5,
+          "expected_name": "Foxp3+Treg",
+          "detected_name": "Foxp3+Treg",
+          "passed": true
+        },
+        {
+          "test_case": 9,
+          "content_preview": "Functional Treg suppress via IL-10, TGF-beta, and IL-35 production. CTLA-4 mediates contact-dependen",
+          "expected_level": 6,
+          "detected_level": 6,
+          "expected_name": "Functional Treg",
+          "detected_name": "Functional Treg",
+          "passed": true
+        },
+        {
+          "test_case": 10,
+          "content_preview": "Human Treg are CD4+CD25+CD127low Foxp3+ with TSDR demethylation. These cells produce IL-10 and TGF-b",
+          "expected_level": 6,
+          "detected_level": 5,
+          "expected_name": "Functional Treg",
+          "detected_name": "Foxp3+Treg",
+          "passed": false
+        }
+      ]
+    },
+    "label_generation": {
+      "total": 4,
+      "passed": 4,
+      "accuracy": 100.0,
+      "details": [
+        {
+          "test_case": 1,
+          "level": 3,
+          "label": "CD4+CD25+CD127low\nCD25high CD127low\nIL-2Rα+/IL-7Rα−\n(n=42)",
+          "expected_keywords": [
+            "CD127low",
+            "IL-2Rα",
+            "IL-7Rα"
+          ],
+          "found_keywords": [
+            "CD127low",
+            "IL-2Rα",
+            "IL-7Rα"
+          ],
+          "passed": true
+        },
+        {
+          "test_case": 2,
+          "level": 5,
+          "label": "Foxp3+Treg\nFoxp3+ stable\nTSDR demethyl\n(n=28)",
+          "expected_keywords": [
+            "stable",
+            "TSDR"
+          ],
+          "found_keywords": [
+            "stable",
+            "TSDR"
+          ],
+          "passed": true
+        },
+        {
+          "test_case": 3,
+          "level": 5,
+          "label": "Foxp3+Treg\nFoxp3+ transient\nCD45RO+\n(n=15)",
+          "expected_keywords": [
+            "transient",
+            "CD45RO"
+          ],
+          "found_keywords": [
+            "transient",
+            "CD45RO"
+          ],
+          "passed": true
+        },
+        {
+          "test_case": 4,
+          "level": 6,
+          "label": "Functional Treg\nIL-10+TGF-β+CTLA-4\n(n=35)",
+          "expected_keywords": [
+            "IL-10",
+            "TGF-β",
+            "CTLA-4"
+          ],
+          "found_keywords": [
+            "IL-10",
+            "TGF-β",
+            "CTLA-4"
+          ],
+          "passed": true
+        }
+      ]
+    },
+    "vocabulary_coverage": {
+      "hsc_level": {
+        "japanese": 21,
+        "english": 18
+      },
+      "clp_level": {
+        "japanese": 16,
+        "english": 14
+      },
+      "cd4_t_level": {
+        "japanese": 20,
+        "english": 17
+      },
+      "cd25_high_cd127_low_level": {
+        "japanese": 19,
+        "english": 20
+      },
+      "treg_origin_level": {
+        "total": 59
+      },
+      "foxp3_treg_level": {
+        "total": 100
+      },
+      "functional_treg_level": {
+        "total": 69
+      }
+    },
+    "gpu_performance": {
+      "gpu_name": "NVIDIA GeForce RTX 4060 Ti",
+      "total_memory_gb": 15.99560546875,
+      "cuda_available": true
+    }
+  }
+}
